@@ -6,6 +6,7 @@ This document captures architecture decisions, issues encountered, and lessons l
 
 ## Goal
 
+
 ## Architecture Summary
 
 ## VPC
@@ -16,13 +17,22 @@ I created a custom VPC instead of using the default VPC so I could fully control
 
 
 ## Subnets
+- Public subnet: project1-public-subnet (10.0.1.0/24)
+- Private subnet: project1-private-subnet (10.0.2.0/24)
+
+I split the network into public and private subnets to control exposure. The public subnet will later host a bastion host, while the private subnet will be used for internal workloads.
+
 
 ## Internet Gateway and Routing
 
+
 ## Security Groups
+
 
 ## IAM
 
+
 ## Break / Fix Exercise
+
 
 ## What I Learned
