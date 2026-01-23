@@ -39,6 +39,25 @@ I learned that a subnet is considered public only when it has a route to an Inte
 
 
 ## Break / Fix Exercise
+### Issue 1: Subnet had no internet access
+
+**What I was trying to do**  
+Understand how public internet access is provided to AWS subnets.
+
+**What wasn’t working**  
+Even after creating an Internet Gateway, the subnet still had no internet access.
+
+**Initial assumptions**  
+I initially assumed attaching an Internet Gateway to the VPC automatically made the subnet public.
+
+**What I discovered**  
+The route table with a route to the Internet Gateway was not associated with any subnet.
+
+**The fix**  
+I associated the public route table with the public subnet.
+
+**What I learned**  
+A subnet is only public when its route table sends internet traffic to an Internet Gateway.
 
 
 ## What I Learned
