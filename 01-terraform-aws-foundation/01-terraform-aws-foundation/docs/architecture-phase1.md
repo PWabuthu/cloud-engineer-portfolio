@@ -24,6 +24,12 @@ I split the network into public and private subnets to control exposure. The pub
 
 
 ## Internet Gateway and Routing
+- Internet Gateway: project1-igw attached to project1-vpc
+- Public route table: project1-public-rt
+- Route: 0.0.0.0/0 → Internet Gateway
+- Associated subnet: project1-public-subnet only
+
+I learned that a subnet is considered public only when it has a route to an Internet Gateway. Simply naming a subnet “public” does not provide internet access.
 
 
 ## Security Groups
