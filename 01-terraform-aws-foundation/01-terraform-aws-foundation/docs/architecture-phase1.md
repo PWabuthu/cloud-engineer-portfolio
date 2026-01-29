@@ -77,4 +77,27 @@ I associated the public route table with the public subnet.
 A subnet is only public when its route table sends internet traffic to an Internet Gateway.
 
 
-## What I Learned
+###Issue 2: Unable to SSH into bastion host due to key file error
+
+**What I was trying to do**  
+Connect to the bastion EC2 instance using SSH from my local machine.
+
+**What wasn’t working**  
+The SSH connection failed with warnings that the identity file could not be found, followed by a “Permission denied (publickey)” error.
+
+**Initial assumptions**  
+I initially thought the issue might be related to the security group or network routing since this was my first SSH attempt to the instance.
+
+**What I discovered**  
+The `.pem` key file was not in my current working directory, so SSH could not locate it. Because no valid key was provided, AWS rejected the authentication attempt.
+
+**The fix**  
+I located the key file on my local machine, referenced it using the full file path in the SSH command, and updated its permissions using `chmod 400` as required by AWS.
+
+**Result**  
+After correcting the key path and permissions, I was able to successfully SSH into the bastion host.
+
+**What I learned**  
+SSH access issues are often caused by local key file path or permission problems rather than AWS networking or security group misconfigurations. Verifying local setup early can save time when troubleshooting.
+
+
