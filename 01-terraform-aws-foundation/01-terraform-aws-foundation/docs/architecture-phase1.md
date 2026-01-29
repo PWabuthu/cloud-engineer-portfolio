@@ -47,6 +47,13 @@ This setup limits public exposure and enforces access through a controlled entry
 
 ## IAM
 
+I created an IAM role for EC2 instances instead of using static access keys.
+
+- Role name: project1-ec2-role
+- Policy attached: AmazonSSMManagedInstanceCore
+
+Using IAM roles allows instances to access AWS services securely without embedding credentials.
+
 
 ## Break / Fix Exercise
 ### Issue 1: Subnet had no internet access
