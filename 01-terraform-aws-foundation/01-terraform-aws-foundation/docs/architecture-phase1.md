@@ -34,6 +34,16 @@ I learned that a subnet is considered public only when it has a route to an Inte
 
 ## Security Groups
 
+**Bastion Security Group**
+- Allows SSH (port 22) from my IP only
+- Used to restrict public access to a single entry point
+
+**Application Security Group**
+- Allows SSH (port 22) only from the bastion security group
+- Prevents direct access from the internet
+
+This setup limits public exposure and enforces access through a controlled entry point.
+
 
 ## IAM
 
