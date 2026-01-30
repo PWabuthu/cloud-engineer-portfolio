@@ -78,6 +78,7 @@ A subnet is only public when its route table sends internet traffic to an Intern
 
 
 
+
 ### **Issue 2: Bastion could reach private instance but SSH authentication failed**
 
 **What I was trying to do**  
@@ -100,3 +101,19 @@ After enabling agent forwarding, SSH access from the bastion to the private inst
 
 **What I learned**  
 When networking is working but SSH fails with a public key error, the issue is often authentication rather than infrastructure. SSH agent forwarding is a clean way to support bastion access without storing private keys on the host.
+
+
+## What I Learned
+
+- Public and private subnets are defined by routing, not by their names.
+- Internet access requires both an Internet Gateway and a route table association.
+- Security groups act as stateful firewalls and can reference other security groups for tighter control.
+- Private EC2 instances should not be directly accessible from the internet.
+- Bastion hosts provide a controlled access path into private networks.
+- A `Permission denied (publickey)` error usually indicates an SSH authentication issue rather than a networking problem.
+- SSH agent forwarding allows secure bastion access without storing private keys on the host.
+- Breaking and fixing issues during the build improves understanding and confidence.
+
+## Phase 1 Status
+
+Phase 1 is complete. The AWS foundation was built manually using core services to establish a strong understanding of networking, security, and access patterns before introducing automation in later phases.
