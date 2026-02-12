@@ -54,3 +54,4 @@ Excluded (for now):
 - Networking behaves exactly the same.
 - SSH access works as expected.
 - Infrastructure can be destroyed and recreated cleanly.
+- Starting small: VPC first, then subnets, then routing.
