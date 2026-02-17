@@ -15,3 +15,19 @@ variable "ssh_allowed_cidr" {
   type        = string
   default     = "0.0.0.0/0"
 }
+
+variable "instance_type" {
+  description = "EC2 instance type for bastion and private instances"
+  type        = string
+  default     = "t3.micro"
+}
+
+variable "key_name" {
+  description = "Name of an existing EC2 key pair in this AWS region"
+  type        = string
+}
+
+variable "ami_id" {
+  description = "AMI ID for EC2 instances (Amazon Linux 2 / AL2023) in the selected region"
+  type        = string
+}
