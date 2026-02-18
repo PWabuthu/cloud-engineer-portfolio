@@ -1,4 +1,4 @@
-#Project 1: AWS Infrastructure Foundation
+# Project 1: AWS Infrastructure Foundation
 
 This project focuses on building a secure AWS foundation using core networking and security concepts.
 
