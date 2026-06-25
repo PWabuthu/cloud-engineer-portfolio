@@ -22,9 +22,9 @@ The project includes a custom VPC, public and private subnets across two Availab
 
 ## Architecture Diagram
 
-The architecture diagram shows the current design for this project.
+The diagram below shows the current design for this project.
 
-> Diagram file will be added here once uploaded to the repository.
+![AWS Infrastructure Foundation Architecture](architecture/aws-infrastructure-foundation.png)
 
 ---
 
