@@ -11,9 +11,8 @@ variable "vpc_cidr" {
 }
 
 variable "ssh_allowed_cidr" {
-  description = "CIDR block allowed to SSH into the bastion host (your public IP /32)"
+  description = "Your public IP address allowed to SSH into the bastion host. Use /32."
   type        = string
-  default     = "0.0.0.0/0"
 }
 
 variable "instance_type" {
@@ -28,6 +27,6 @@ variable "key_name" {
 }
 
 variable "ami_id" {
-  description = "AMI ID for EC2 instances (Amazon Linux 2 / AL2023) in the selected region"
+  description = "AMI ID for EC2 instances in us-east-1"
   type        = string
 }
