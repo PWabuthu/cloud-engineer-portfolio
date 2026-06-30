@@ -241,3 +241,5 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+# Local Terraform output notes
+terraform-output.txt
