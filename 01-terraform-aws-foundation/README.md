@@ -206,30 +206,30 @@ The VPC Flow Logs piece was also important. Building the network is one part of 
 
 ## Terraform Rebuild
 
-After completing Terraform training, I am rebuilding this architecture using Infrastructure as Code.
+After completing Terraform training, I rebuilt this architecture using Infrastructure as Code.
 
-The Terraform rebuild will start with the core network:
+The Terraform configuration now recreates the main pieces of the environment:
 
-* VPC
-* Public and private subnets
-* Internet Gateway
-* Route tables
-* NAT Gateway
-* Security groups
-* EC2 instances
-* VPC Flow Logs
+- VPC
+- Public and private subnets across two Availability Zones
+- Internet Gateway
+- Route tables
+- NAT Gateway
+- Security groups
+- Bastion Host
+- Private EC2 instances
+- IAM role and instance profile for EC2
 
-The goal is to make the environment repeatable, version-controlled, and easier to update.
+I tested the rebuild by running Terraform locally through the full workflow:
 
----
+```text
+terraform init
+terraform validate
+terraform plan
+terraform apply
+terraform destroy
+```
 
-## Future Improvements
+Terraform successfully created the infrastructure, and I destroyed the resources afterward to avoid unnecessary AWS costs.
 
-Planned improvements include:
-
-* Add an Application Load Balancer
-* Add Auto Scaling for private instances
-* Replace Bastion Host access with AWS Systems Manager Session Manager
-* Add more detailed CloudWatch alarms
-* Add cost estimate documentation
-* Continue improving the Terraform structure
+This was an important step because it proved the project was not just documented in GitHub. The architecture could actually be recreated from code.
