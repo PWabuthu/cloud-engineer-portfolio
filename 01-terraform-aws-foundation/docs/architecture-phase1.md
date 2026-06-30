@@ -1,119 +1,80 @@
-# Project 1 — AWS Infrastructure Foundation
-## Phase 1: AWS Console Build
+# Phase 1: Manual AWS Console Build
 
-I built this environment manually first to better understand how routing and access patterns behave before introducing automation.
+This is the original manual build for Project 1, before I rebuilt it in Terraform.
 
+I did the first version by hand in the console because I wanted to actually understand the networking before turning it into code. This phase covered VPC routing, public vs. private subnet behavior, bastion access, security groups, and IAM roles.
 
-## Goal
+The architecture has grown a lot since then. The current design is in the main `README.md`.
 
+---
 
-## Architecture Summary
+## Original Goal
 
-## VPC
-- Name: project1-vpc
-- CIDR block: 10.0.0.0/16
+Build a small AWS networking foundation by hand and troubleshoot it directly in the console. I wanted to actually understand:
 
-I created a custom VPC instead of using the default VPC so I could fully control networking and routing as the environment grows.
+* how a custom VPC is structured
+* what makes a subnet public or private
+* how route tables control traffic flow
+* how a bastion host reaches private instances
+* how security groups control access between resources
+* why IAM roles are better than hardcoding credentials on an EC2 instance
 
+## Original Architecture
 
-## Subnets
-- Public subnet: project1-public-subnet (10.0.1.0/24)
-- Private subnet: project1-private-subnet (10.0.2.0/24)
+The first version was small on purpose:
 
-I split the network into public and private subnets to control exposure. The public subnet will later host a bastion host, while the private subnet will be used for internal workloads.
+* Custom VPC
+* One public subnet, one private subnet
+* Internet Gateway
+* Public route table
+* Bastion host
+* Private EC2 instance
+* Security groups
+* IAM role for EC2
 
+I kept it minimal so I could understand the foundation before piling on more pieces.
 
-## Internet Gateway and Routing
-- Internet Gateway: project1-igw attached to project1-vpc
-- Public route table: project1-public-rt
-- Route: 0.0.0.0/0 → Internet Gateway
-- Associated subnet: project1-public-subnet only
+### VPC
 
-I learned that a subnet is considered public only when it has a route to an Internet Gateway. Simply naming a subnet “public” does not provide internet access.
+`project1-vpc`, CIDR `10.0.0.0/16`. I used a custom VPC instead of the default one so I'd control the network design from the start.
 
+### Subnets
 
-## Security Groups
+* Public: `project1-public-subnet` — `10.0.1.0/24`
+* Private: `project1-private-subnet` — `10.0.2.0/24`
 
-**Bastion Security Group**
-- Allows SSH (port 22) from my IP only
-- Used to restrict public access to a single entry point
+This was just meant to get the basic public/private behavior down. Later I expanded it into a multi-AZ design with public and private subnets in two AZs.
 
-**Application Security Group**
-- Allows SSH (port 22) only from the bastion security group
-- Prevents direct access from the internet
+### Internet Gateway and Routing
 
-This setup limits public exposure and enforces access through a controlled entry point.
+* IGW: `project1-igw`
+* Public route table: `project1-public-rt`, with `0.0.0.0/0` → IGW
+* Associated with the public subnet only
 
+Biggest lesson here: a subnet isn't public because of its name. It's public because its route table sends internet-bound traffic to an IGW.
 
-## IAM
+### Security Groups
 
-I created an IAM role for EC2 instances instead of using static access keys.
+The bastion SG allowed SSH from my IP only — it was the one controlled entry point into the environment.
 
-- Role name: project1-ec2-role
-- Policy attached: AmazonSSMManagedInstanceCore
+The private instance SG allowed SSH only from the bastion SG, so it was never directly reachable from the internet.
 
-Using IAM roles allows instances to access AWS services securely without embedding credentials.
+### IAM
 
+Used an IAM role (`project1-ec2-role`, `AmazonSSMManagedInstanceCore`) instead of static access keys. This helped me understand why instances should get permissions through an AWS-managed identity rather than long-term credentials stored on the instance.
 
-## Break / Fix Exercise
-### Issue 1: Subnet had no internet access
+## Break/Fix Notes
 
-**What I was trying to do**  
-Understand how public internet access is provided to AWS subnets.
+**Subnet had no internet access.** Even after attaching an IGW to the VPC, the subnet still wasn't reaching the internet. I assumed attaching the IGW to the VPC was enough — it isn't. The route table with the IGW route was never associated with the subnet. Fixed by associating it. Lesson: public/private comes down to routing, not just having an IGW in the VPC.
 
-**What wasn’t working**  
-Even after creating an Internet Gateway, the subnet still had no internet access.
+**Bastion could reach the private instance, but SSH auth failed.** Connection got there fine, but I hit `Permission denied (publickey)`. First guess was a security group or subnet problem. Turned out networking was fine — the bastion just didn't have the private key to authenticate into the private instance. Fixed it with agent forwarding (`ssh -A`) so my local key could be used without copying it onto the bastion. Lesson: if SSH reaches the instance but fails on the key, it's an auth problem, not a networking one — and agent forwarding is better than storing keys on a jump box.
 
-**Initial assumptions**  
-I initially assumed attaching an Internet Gateway to the VPC automatically made the subnet public.
+## What I Took Away From This
 
-**What I discovered**  
-The route table with a route to the Internet Gateway was not associated with any subnet.
+The real learning happened when things broke and I had to trace the path step by step. Public vs. private subnet behavior comes down to routing, not naming — that one stuck with me. I also came away preferring security group references over broadly opened ports.
 
-**The fix**  
-I associated the public route table with the public subnet.
+Walking through the full access path — my machine → bastion → private instance — made the later Terraform rebuild a lot smoother, since I already knew what each resource was supposed to be doing.
 
-**What I learned**  
-A subnet is only public when its route table sends internet traffic to an Internet Gateway.
+## Status
 
-
-
-
-### **Issue 2: Bastion could reach private instance but SSH authentication failed**
-
-**What I was trying to do**  
-SSH from the bastion host into the private EC2 instance in the private subnet.
-
-**What wasn’t working**  
-The SSH connection reached the private instance but failed with a `Permission denied (publickey)` error.
-
-**Initial assumptions**  
-I initially assumed this might be caused by a security group or subnet configuration issue.
-
-**What I discovered**  
-Networking and security groups were configured correctly, but the bastion host did not have access to the SSH private key required to authenticate. The key existed on my local machine, not on the bastion.
-
-**The fix**  
-I enabled SSH agent forwarding (`ssh -A`) when connecting to the bastion host so my local SSH key could be used to authenticate to the private instance.
-
-**Result**  
-After enabling agent forwarding, SSH access from the bastion to the private instance succeeded.
-
-**What I learned**  
-When networking is working but SSH fails with a public key error, the issue is often authentication rather than infrastructure. SSH agent forwarding is a clean way to support bastion access without storing private keys on the host.
-
-
-## What I Learned
-
-- Public and private subnets are defined by routing, not by their names.
-- Internet access requires both an Internet Gateway and a route table association.
-- Security groups act as stateful firewalls and can reference other security groups for tighter control.
-- Private EC2 instances should not be directly accessible from the internet.
-- Bastion hosts provide a controlled access path into private networks.
-- A `Permission denied (publickey)` error usually indicates an SSH authentication issue rather than a networking problem.
-- SSH agent forwarding allows secure bastion access without storing private keys on the host.
-- Breaking and fixing issues during the build improves understanding and confidence.
-
-## Phase 1 Status
-
-Phase 1 is complete. The AWS foundation was built manually using core services to establish a strong understanding of networking, security, and access patterns before introducing automation in later phases.
+Phase 1 is done. I terminated the manual environment to control costs, and the project has since moved into the Terraform rebuild, recreating the same core architecture as code.
