@@ -120,7 +120,7 @@ IAM roles are used for EC2 permissions instead of placing long-term credentials 
 
 VPC Flow Logs are included to capture network traffic metadata inside the VPC.
 
-I sent the logs to Cloudwatch so I could actually see what was moving through the environment and use it for troubleshooting. This helped me understand how visibility fits into infrastructure design, especially from a security and operations perspective.
+I sent the logs to CloudWatch so I could actually see what was moving through the environment and use it for troubleshooting. This helped me understand how visibility fits into infrastructure design, especially from a security and operations perspective.
 
 ---
 
