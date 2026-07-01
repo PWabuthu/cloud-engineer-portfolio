@@ -15,8 +15,8 @@ The project includes a custom VPC, public and private subnets across two Availab
 * Manual AWS deployment completed
 * Architecture diagram completed
 * Terraform training completed through Digital Cloud Training
-* Terraform rebuild in progress
-* GitHub documentation being updated as the project evolves
+* Terraform rebuild tested successfully
+* AWS resources destroyed after validation to control costs
 
 ---
 
@@ -120,7 +120,7 @@ IAM roles are used for EC2 permissions instead of placing long-term credentials 
 
 VPC Flow Logs are included to capture network traffic metadata inside the VPC.
 
-I sent the logs to cloudwatch so I could actually see what was moving through the environment and use it for troubleshooting. This helped me understand how visibility fits into infrastructure design, especially from a security and operations perspective.
+I sent the logs to Cloudwatch so I could actually see what was moving through the environment and use it for troubleshooting. This helped me understand how visibility fits into infrastructure design, especially from a security and operations perspective.
 
 ---
 
@@ -233,3 +233,13 @@ terraform destroy
 Terraform successfully created the infrastructure, and I destroyed the resources afterward to avoid unnecessary AWS costs.
 
 This was an important step because it proved the project was not just documented in GitHub. The architecture could actually be recreated from code.
+
+---
+
+## Validation Evidence
+
+The screenshot below shows the successful Terraform apply from the local rebuild test.
+
+![Terraform Apply Complete](screenshots/terraform-apply-complete.png)
+
+After confirming the resources were created, I destroyed the environment to avoid ongoing AWS costs.
