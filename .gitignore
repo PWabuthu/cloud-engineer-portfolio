@@ -243,3 +243,5 @@ override.tf.json
 *_override.tf.json
 # Local Terraform output notes
 terraform-output.txt
+# macOS system files
+.DS_Store
