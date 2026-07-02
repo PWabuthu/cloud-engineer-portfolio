@@ -47,3 +47,13 @@ output "nat_gateway_id" {
   description = "ID of the NAT Gateway"
   value       = aws_nat_gateway.nat.id
 }
+
+output "vpc_flow_log_id" {
+  description = "ID of the VPC Flow Log"
+  value       = aws_flow_log.vpc_flow_logs.id
+}
+
+output "vpc_flow_log_group_name" {
+  description = "CloudWatch Log Group used for VPC Flow Logs"
+  value       = aws_cloudwatch_log_group.vpc_flow_logs.name
+}
