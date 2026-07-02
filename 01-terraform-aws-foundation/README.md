@@ -219,6 +219,8 @@ The Terraform configuration now recreates the main pieces of the environment:
 - Bastion Host
 - Private EC2 instances
 - IAM role and instance profile for EC2
+- VPC Flow Logs
+- CloudWatch Log Group for flow log storage
 
 I tested the rebuild by running Terraform locally through the full workflow:
 
@@ -242,4 +244,8 @@ The screenshot below shows the successful Terraform apply from the local rebuild
 
 ![Terraform Apply Complete](screenshots/terraform-apply-complete.png)
 
-After confirming the resources were created, I destroyed the environment to avoid ongoing AWS costs.
+The screenshot below shows the VPC Flow Log active and sending traffic metadata to CloudWatch Logs.
+
+![VPC Flow Log Active](screenshots/vpc-flow-log-active.png)
+
+After confirming the resources were created and the VPC Flow Log was active, I destroyed the environment to avoid ongoing AWS costs.
