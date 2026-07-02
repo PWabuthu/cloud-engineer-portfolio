@@ -6,15 +6,17 @@ I started manually because I wanted to actually understand how the network piece
 
 The current Terraform code creates:
 
-* VPC
-* Public and private subnets across two Availability Zones
-* Internet Gateway
-* Public and private route tables
-* NAT Gateway
-* Security groups
-* Bastion Host
-* Private EC2 instances
-* IAM role and instance profile for EC2
+- VPC
+- Public and private subnets across two Availability Zones
+- Internet Gateway
+- Public and private route tables
+- NAT Gateway
+- Security groups
+- Bastion Host
+- Private EC2 instances
+- IAM role and instance profile for EC2
+- VPC Flow Logs
+- CloudWatch Log Group for flow log storage
 
 Building it this way forces me to map every Terraform resource back to something I already built manually, so I am not just copying syntax. I know what each block is doing in the network.
 
@@ -32,13 +34,14 @@ terraform destroy
 
 ## File Breakdown
 
-* `versions.tf` — Terraform and AWS provider version constraints
-* `provider.tf` — AWS provider and region config
-* `variables.tf` — inputs like VPC CIDR, key pair name, AMI ID, instance type, and allowed SSH CIDR
-* `main.tf` — VPC, subnets, route tables, NAT Gateway, security groups
-* `ec2.tf` — bastion host and private EC2 instances
-* `iam.tf` — IAM role and instance profile for EC2
-* `outputs.tf` — VPC ID, subnet IDs, NAT Gateway ID, instance IPs
+- `versions.tf` — Terraform and AWS provider version constraints
+- `provider.tf` — AWS provider and region config
+- `variables.tf` — inputs like VPC CIDR, key pair name, AMI ID, instance type, and allowed SSH CIDR
+- `main.tf` — VPC, subnets, route tables, NAT Gateway, security groups
+- `ec2.tf` — bastion host and private EC2 instances
+- `iam.tf` — IAM role and instance profile for EC2
+- `flow-logs.tf` — CloudWatch Log Group, IAM role and policy for VPC Flow Logs, and the VPC Flow Log resource
+- `outputs.tf` — VPC ID, subnet IDs, NAT Gateway ID, instance IPs
 
 ## Local Variables
 
