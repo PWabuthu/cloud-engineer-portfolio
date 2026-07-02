@@ -249,3 +249,17 @@ The screenshot below shows the VPC Flow Log active and sending traffic metadata 
 ![VPC Flow Log Active](screenshots/vpc-flow-log-active.png)
 
 After confirming the resources were created and the VPC Flow Log was active, I destroyed the environment to avoid ongoing AWS costs.
+
+---
+
+## Future Improvements
+
+A few things I'd change for a production environment:
+
+The first improvement would be replacing the Bastion Host with AWS Systems Manager Session Manager. That would reduce the need for SSH access and remove the need to manage a jump box.
+
+I would also add an Application Load Balancer and Auto Scaling Group if this environment needed to support a real application. The current design uses multiple subnets across two Availability Zones, but it does not include load balancing or automatic instance replacement yet.
+
+For monitoring, I would add CloudWatch metric filters, alarms, and a small dashboard so the VPC Flow Logs are easier to review during troubleshooting.
+
+The next project will build on this by focusing more directly on AWS security monitoring, including CloudTrail, GuardDuty, AWS Config, SNS alerts, and security findings documentation.
