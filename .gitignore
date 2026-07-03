@@ -245,3 +245,5 @@ override.tf.json
 terraform-output.txt
 # macOS system files
 .DS_Store
+# Local notes
+interview-practice/
