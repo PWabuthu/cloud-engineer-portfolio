@@ -8,7 +8,8 @@ I’m setting up a basic account monitoring baseline using CloudTrail, GuardDuty
 
 - Project folder created
 - Terraform base files created
-- CloudTrail setup in progress
+- CloudTrail logging baseline completed
+- CloudTrail log file validation enabled
 - GuardDuty, AWS Config, SNS alerts, and runbook still to come
 
 ## Planned AWS Services
@@ -31,6 +32,18 @@ GuardDuty will be enabled for threat detection. When GuardDuty creates a finding
 AWS Config will check for configuration issues like public S3 buckets and security groups that allow too much inbound access.
 
 I’m also writing a security runbook alongside this project: how I would triage a finding, what I would check first, and what remediation might look like. Not because anyone is asking for it, but because “I’d know what to do” is not the same as having it written down.
+
+## CloudTrail Logging Baseline
+
+The first phase of this project sets up CloudTrail logging for the AWS account.
+
+CloudTrail records account activity and sends the logs to a secured S3 bucket. The bucket has public access blocked, server-side encryption enabled, and versioning turned on.
+
+I also enabled CloudTrail log file validation. This helps verify that log files were not changed after CloudTrail delivered them to S3.
+
+The trail is configured as a multi-region trail so activity from multiple AWS regions can be captured.
+
+![CloudTrail Validation](screenshots/cloudtrail-validation.png)
 
 ## Why I Built This
 
