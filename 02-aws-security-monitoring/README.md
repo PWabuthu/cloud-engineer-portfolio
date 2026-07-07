@@ -10,7 +10,13 @@ I’m setting up a basic account monitoring baseline using CloudTrail, GuardDuty
 - Terraform base files created
 - CloudTrail logging baseline completed
 - CloudTrail log file validation enabled
-- GuardDuty, AWS Config, SNS alerts, and runbook still to come
+- GuardDuty detector enabled
+- EventBridge rule created for GuardDuty findings
+- SNS topic created for security alerts
+- Email subscription confirmed manually
+- GuardDuty sample findings generated to validate alert delivery
+- EventBridge severity filter added for medium and high severity findings
+- AWS Config and security runbook still to come
 
 ## Planned AWS Services
 
@@ -25,9 +31,11 @@ I’m setting up a basic account monitoring baseline using CloudTrail, GuardDuty
 
 ## Architecture Overview
 
-CloudTrail will log account activity and send the logs to a secured S3 bucket.
+CloudTrail logs account activity and sends the logs to a secured S3 bucket.
 
-GuardDuty will be enabled for threat detection. When GuardDuty creates a finding, EventBridge will route the event to an SNS topic so an email alert can be sent.
+GuardDuty is enabled for threat detection.
+
+EventBridge routes medium and high severity GuardDuty findings to an SNS topic for email alerts.
 
 AWS Config will check for configuration issues like public S3 buckets and security groups that allow too much inbound access.
 
@@ -44,6 +52,26 @@ I also enabled CloudTrail log file validation. This helps verify that log files 
 The trail is configured as a multi-region trail so activity from multiple AWS regions can be captured.
 
 ![CloudTrail Validation](screenshots/cloudtrail-validation.png)
+
+## GuardDuty Alerting Pipeline
+
+The second phase of this project adds threat detection and alerting.
+
+GuardDuty creates findings when it detects suspicious activity in the AWS account. I used EventBridge as the routing layer because GuardDuty findings are emitted as EventBridge events, and EventBridge gives me a place to filter or route findings before sending them to SNS.
+
+I tested the alert path by generating GuardDuty sample findings. The test confirmed that GuardDuty findings were routed through EventBridge and delivered through SNS email alerts.
+
+The first version routed all GuardDuty findings to SNS. That worked for validation, but it created too much alert noise during testing.
+
+I updated the EventBridge rule to only send medium and high severity findings to SNS by filtering for findings with severity greater than or equal to 4.
+
+In this version, low-severity findings are not sent to email. A stronger production version would route lower-severity findings somewhere less noisy, such as CloudWatch Logs or an S3 archive, so they can still be reviewed without creating inbox noise.
+
+I did not include a screenshot of the SNS subscription because it shows my email address and AWS account-specific ARN details. For public documentation, I included the GuardDuty detector validation and EventBridge severity filter screenshots instead.
+
+![GuardDuty Detector Enabled](screenshots/guardduty-detector-enabled.png)
+
+![EventBridge GuardDuty Severity Filter](screenshots/eventbridge-guardduty-severity-filter.png)
 
 ## Why I Built This
 

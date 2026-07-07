@@ -56,11 +56,18 @@ resource "aws_sns_topic_policy" "security_alerts" {
 
 resource "aws_cloudwatch_event_rule" "guardduty_findings" {
   name        = "${var.project_name}-guardduty-findings"
-  description = "Capture GuardDuty findings and send them to SNS"
+  description = "Capture medium and high severity GuardDuty findings and send them to SNS"
 
   event_pattern = jsonencode({
     source      = ["aws.guardduty"]
     detail-type = ["GuardDuty Finding"]
+    detail = {
+      severity = [
+        {
+          numeric = [">=", 4]
+        }
+      ]
+    }
   })
 
   tags = {
