@@ -16,7 +16,9 @@ I’m setting up a basic account monitoring baseline using CloudTrail, GuardDuty
 - Email subscription confirmed manually
 - GuardDuty sample findings generated to validate alert delivery
 - EventBridge severity filter added for medium and high severity findings
-- AWS Config and security runbook still to come
+- AWS Config recorder enabled
+- AWS Config managed rules added
+- Security runbook still to come
 
 ## Planned AWS Services
 
@@ -37,7 +39,7 @@ GuardDuty is enabled for threat detection.
 
 EventBridge routes medium and high severity GuardDuty findings to an SNS topic for email alerts.
 
-AWS Config will check for configuration issues like public S3 buckets and security groups that allow too much inbound access.
+AWS Config checks for configuration issues like public S3 buckets, unrestricted SSH access, and root account MFA.
 
 I’m also writing a security runbook alongside this project: how I would triage a finding, what I would check first, and what remediation might look like. Not because anyone is asking for it, but because “I’d know what to do” is not the same as having it written down.
 
@@ -72,6 +74,22 @@ I did not include a screenshot of the SNS subscription because it shows my email
 ![GuardDuty Detector Enabled](screenshots/guardduty-detector-enabled.png)
 
 ![EventBridge GuardDuty Severity Filter](screenshots/eventbridge-guardduty-severity-filter.png)
+
+## AWS Config Compliance Monitoring
+
+The third phase of this project adds AWS Config for configuration monitoring.
+
+AWS Config records supported resource configurations and evaluates them against managed rules. I added a configuration recorder, delivery channel, secured S3 bucket for Config logs, and three managed rules.
+
+The managed rules currently check for:
+
+- S3 buckets that allow public read access
+- Security groups that allow unrestricted SSH access
+- Whether MFA is enabled for the AWS root account
+
+I validated the setup by confirming the Config recorder was running successfully and that the managed rules were created.
+
+![AWS Config Rules Enabled](screenshots/aws-config-rules-enabled.png)
 
 ## Why I Built This
 
