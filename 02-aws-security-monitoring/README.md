@@ -2,7 +2,7 @@
 
 This is the follow-up to my networking project. That project was about building the environment: VPC, subnets, Terraform, NAT Gateway, bastion access, and VPC Flow Logs. This one is about monitoring what happens inside an AWS account.
 
-I’m setting up a basic account monitoring baseline using CloudTrail, GuardDuty, AWS Config, SNS, EventBridge, and CloudWatch. The goal is to log account activity, detect suspicious behavior, catch risky configurations, and send alerts when something needs attention.
+I'm setting up a basic account monitoring baseline using CloudTrail, GuardDuty, AWS Config, EventBridge, SNS, Amazon S3, and IAM. The goal is to log account activity, detect suspicious behavior, catch risky configurations, and send alerts when something needs attention.
 
 ## Project Status
 
@@ -15,39 +15,42 @@ I’m setting up a basic account monitoring baseline using CloudTrail, GuardDuty
 - SNS topic created for security alerts
 - Email subscription confirmed manually
 - GuardDuty sample findings generated to validate alert delivery
-- EventBridge severity filter added for medium and high severity findings
+- EventBridge severity filter added for medium and higher severity findings
 - AWS Config recorder enabled
 - AWS Config managed rules added
-- Security runbook still to come
+- AWS Config non-compliance validation completed
+- Security runbook added
 
-## Planned AWS Services
+## AWS Services Used
 
 - AWS CloudTrail
 - Amazon S3
 - Amazon GuardDuty
-- Amazon SNS
 - Amazon EventBridge
+- Amazon SNS
 - AWS Config
-- Amazon CloudWatch
 - IAM
 
 ## Architecture Overview
 
-CloudTrail logs account activity and sends the logs to a secured S3 bucket.
+This project creates a basic AWS account security monitoring baseline.
 
-GuardDuty is enabled for threat detection.
+The main monitoring flows are:
 
-EventBridge routes medium and high severity GuardDuty findings to an SNS topic for email alerts.
+- CloudTrail records AWS account activity and stores logs in a secured S3 bucket.
+- GuardDuty monitors the account for suspicious activity.
+- EventBridge filters GuardDuty findings by severity and sends medium and higher severity findings to SNS.
+- SNS sends email alerts for findings that need faster attention.
+- AWS Config records resource configuration changes and checks resources against managed compliance rules.
+- IAM roles and policies allow AWS services to deliver logs, record configurations, and publish alerts without using broad admin-style permissions.
 
-AWS Config checks for configuration issues like public S3 buckets, unrestricted SSH access, and root account MFA.
-
-I’m also writing a security runbook alongside this project: how I would triage a finding, what I would check first, and what remediation might look like. Not because anyone is asking for it, but because “I’d know what to do” is not the same as having it written down.
+The security runbook documents how I validated the alerting path, how I would triage real findings, what evidence I would check, and what limitations still exist in this version.
 
 ## CloudTrail Logging Baseline
 
 The first phase of this project sets up CloudTrail logging for the AWS account.
 
-CloudTrail records account activity and sends the logs to a secured S3 bucket. The bucket has public access blocked, server-side encryption enabled, and versioning turned on.
+CloudTrail records account activity and sends the logs to a secured S3 bucket. The bucket has public access blocked, server-side encryption using SSE-S3 enabled, and versioning turned on.
 
 I also enabled CloudTrail log file validation. This helps verify that log files were not changed after CloudTrail delivered them to S3.
 
@@ -65,7 +68,7 @@ I tested the alert path by generating GuardDuty sample findings. The test confir
 
 The first version routed all GuardDuty findings to SNS. That worked for validation, but it created too much alert noise during testing.
 
-I updated the EventBridge rule to only send medium and high severity findings to SNS by filtering for findings with severity greater than or equal to 4.
+I updated the EventBridge rule to send findings with severity greater than or equal to 4 to SNS. That keeps the email path focused on medium and higher severity findings.
 
 In this version, low-severity findings are not sent to email. A stronger production version would route lower-severity findings somewhere less noisy, such as CloudWatch Logs or an S3 archive, so they can still be reviewed without creating inbox noise.
 
@@ -87,14 +90,115 @@ The managed rules currently check for:
 - Security groups that allow unrestricted SSH access
 - Whether MFA is enabled for the AWS root account
 
-I validated the setup by confirming the Config recorder was running successfully and that the managed rules were created.
+I validated the setup in two ways. First, I confirmed that the Config recorder was running successfully and that the managed rules were created.
+
+Then I created a temporary security group that allowed SSH from `0.0.0.0/0` so I could test whether the `INCOMING_SSH_DISABLED` managed rule would catch it. AWS Config marked the security group as `NON_COMPLIANT`, which confirmed that the rule was evaluating resources as expected.
+
+After the test, I removed the open SSH rule and deleted the temporary security group.
 
 ![AWS Config Rules Enabled](screenshots/aws-config-rules-enabled.png)
 
+![AWS Config Open SSH Non-Compliant](screenshots/aws-config-open-ssh-noncompliant.png)
+
+## IAM and Permissions
+
+IAM is part of this project because the monitoring services need permission to record activity, deliver logs, and publish alerts.
+
+For AWS Config, I created a service role that allows Config to record supported AWS resources and evaluate them against managed rules.
+
+For CloudTrail and AWS Config log delivery, I used S3 bucket policies that allow the AWS service principals to write logs only to the dedicated log buckets for this project.
+
+For EventBridge and SNS, I used an SNS topic policy that allows EventBridge to publish GuardDuty findings to the security alerts topic.
+
+The permissions are scoped to the specific bucket, topic, or AWS service role used in this project. I did not add `aws:SourceArn` or `aws:SourceAccount` conditions to the bucket policies in this version, so I am treating that as a hardening improvement for a later pass rather than claiming it is already handled.
+
+## How to Deploy
+
+This project is deployed with Terraform.
+
+From the Terraform folder, run:
+
+    cd 02-aws-security-monitoring/terraform
+    terraform init
+    terraform plan -var-file="terraform.tfvars"
+    terraform apply -var-file="terraform.tfvars"
+
+The `terraform.tfvars` file is used for local values such as the alert email address. It is intentionally not committed to GitHub.
+
+Example:
+
+    alert_email = "your-email@example.com"
+
+After applying, the SNS email subscription must be confirmed manually from the email inbox before alerts can be delivered.
+
+## Validation Commands
+
+These are the main validation commands I used during the project.
+
+Check CloudTrail:
+
+    aws cloudtrail describe-trails \
+      --region us-east-1 \
+      --query "trailList[*].[Name,S3BucketName,IsMultiRegionTrail,LogFileValidationEnabled]" \
+      --output table
+
+Check GuardDuty:
+
+    aws guardduty list-detectors \
+      --region us-east-1 \
+      --output table
+
+Check AWS Config recorder status:
+
+    aws configservice describe-configuration-recorder-status \
+      --region us-east-1 \
+      --query "ConfigurationRecordersStatus[*].[name,recording,lastStatus]" \
+      --output table
+
+Check AWS Config rules:
+
+    aws configservice describe-config-rules \
+      --region us-east-1 \
+      --query "ConfigRules[*].[ConfigRuleName,Source.SourceIdentifier]" \
+      --output table
+
+Check for non-compliant SSH security groups:
+
+    aws configservice get-compliance-details-by-config-rule \
+      --config-rule-name security-monitoring-incoming-ssh-disabled \
+      --compliance-types NON_COMPLIANT \
+      --region us-east-1 \
+      --query "EvaluationResults[*].[EvaluationResultIdentifier.EvaluationResultQualifier.ResourceType,EvaluationResultIdentifier.EvaluationResultQualifier.ResourceId,ComplianceType]" \
+      --output table
+
+## Cleanup
+
+To remove the Terraform-managed resources:
+
+    terraform destroy -var-file="terraform.tfvars"
+
+During cleanup, the CloudTrail and AWS Config S3 buckets may need extra attention because versioning is enabled. If the buckets contain object versions or delete markers, Terraform may not be able to delete them until those versions are removed.
+
+That happened during this project, and I documented the cleanup lesson in the security runbook.
+
+## Security Runbook
+
+I added a security runbook to document how I validated the monitoring setup and how I would respond to findings.
+
+The runbook covers:
+
+- GuardDuty sample finding validation
+- Severity filtering decisions
+- EventBridge rule pattern
+- Real finding triage process
+- CloudTrail review process
+- AWS Config compliance review
+- Current limitations and future improvements
+
+Runbook: [Security Monitoring Runbook](docs/security-runbook.md)
+
 ## Why I Built This
 
-The networking project was about building infrastructure. This project is about knowing what is happening inside the AWS account.
+The networking project was about building infrastructure. This project is about watching what happens after the infrastructure exists.
 
-It is not enough to have a clean VPC if I cannot tell who changed something, whether GuardDuty flagged an issue, or if a security group is open to the internet and I have not noticed yet.
-
-That is the gap this project is meant to close: using AWS security tooling to answer those questions instead of just knowing the theory.
+I wanted to practice the monitoring side of AWS: logging account activity, detecting suspicious behavior, checking risky configurations, and documenting how I would investigate findings.
