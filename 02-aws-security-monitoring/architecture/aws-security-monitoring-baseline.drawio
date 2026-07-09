@@ -1,0 +1,81 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="YRqoskUacQRUr3BczQ4J">
+    <mxGraphModel dx="2490" dy="1486" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;AWS Security Monitoring Baseline&lt;/font&gt;" vertex="1">
+          <mxGeometry height="40" width="280" x="220" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-9" edge="1" parent="1" source="cVWNzG6h-W4jl4gcXNJR-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="490" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-2" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws3.cloudtrail;fillColor=#759C3E;gradientColor=none;" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;AWS CloudTrail&lt;/font&gt;" vertex="1">
+          <mxGeometry height="100" width="100" x="190" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-3" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws3.s3;fillColor=#E05243;gradientColor=none;" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;CloudTrail Logs Bucket&lt;/font&gt;" vertex="1">
+          <mxGeometry height="93" width="76.5" x="490" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-10" parent="1" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#DD344C;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.guardduty;" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;GuardDuty&lt;/font&gt;" vertex="1">
+          <mxGeometry height="78" width="78" x="80" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-11" parent="1" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.eventbridge;" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;EventBridge&lt;/font&gt;" vertex="1">
+          <mxGeometry height="78" width="78" x="280" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-17" edge="1" parent="1" source="cVWNzG6h-W4jl4gcXNJR-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="670" y="359" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-13" parent="1" style="sketch=0;points=[[0,0,0],[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0,0],[0,1,0],[0.25,1,0],[0.5,1,0],[0.75,1,0],[1,1,0],[0,0.25,0],[0,0.5,0],[0,0.75,0],[1,0.25,0],[1,0.5,0],[1,0.75,0]];outlineConnect=0;fontColor=#232F3E;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sns;" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Amazon SNS&lt;/font&gt;" vertex="1">
+          <mxGeometry height="78" width="78" x="480" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-14" parent="1" style="shape=mxgraph.signs.tech.mail;html=1;pointerEvents=1;fillColor=#000000;strokeColor=none;verticalLabelPosition=bottom;verticalAlign=top;align=center;" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Email Notification&lt;/font&gt;" vertex="1">
+          <mxGeometry height="75" width="99" x="670" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-15" edge="1" parent="1" source="cVWNzG6h-W4jl4gcXNJR-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" target="cVWNzG6h-W4jl4gcXNJR-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-16" edge="1" parent="1" source="cVWNzG6h-W4jl4gcXNJR-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" target="cVWNzG6h-W4jl4gcXNJR-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-21" edge="1" parent="1" source="cVWNzG6h-W4jl4gcXNJR-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="cVWNzG6h-W4jl4gcXNJR-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-35" edge="1" parent="1" source="cVWNzG6h-W4jl4gcXNJR-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="cVWNzG6h-W4jl4gcXNJR-22">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="178" y="700" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-18" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws3.config;fillColor=#759C3E;gradientColor=none;" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;AWS Config&lt;/font&gt;" vertex="1">
+          <mxGeometry height="93" width="76.5" x="140" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-22" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Managed Rules&lt;/font&gt;" vertex="1">
+          <mxGeometry height="80" width="160" x="480" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-20" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws3.s3;fillColor=#E05243;gradientColor=none;" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Config Logs Bucket&lt;/font&gt;" vertex="1">
+          <mxGeometry height="93" width="76.5" x="490" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-28" parent="1" style="outlineConnect=0;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;shape=mxgraph.aws3.iam;fillColor=#759C3E;gradientColor=none;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;IAM Roles and Policies&lt;/font&gt;" vertex="1">
+          <mxGeometry height="90" width="44" x="660" y="770" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-32" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Severity filter &amp;gt;= 4" vertex="1">
+          <mxGeometry height="50" width="100" x="290" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-33" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Validated: GuardDuty sample findings + AWS Config NON_COMPLIANT test&lt;/font&gt;" vertex="1">
+          <mxGeometry height="40" width="480" x="78" y="880" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-34" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;div&gt;S3 public read prohibited&lt;/div&gt;&lt;div&gt;Incoming SSH disabled&lt;/div&gt;&lt;div&gt;Root account MFA enabled&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="380" x="370" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="cVWNzG6h-W4jl4gcXNJR-36" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;div&gt;Config service role&lt;/div&gt;&lt;div&gt;S3 bucket policies&lt;/div&gt;&lt;div&gt;SNS topic policy&lt;/div&gt;" vertex="1">
+          <mxGeometry height="150" width="523" x="410" y="840" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

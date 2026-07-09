@@ -46,6 +46,10 @@ The main monitoring flows are:
 
 The security runbook documents how I validated the alerting path, how I would triage real findings, what evidence I would check, and what limitations still exist in this version.
 
+## Architecture Diagram
+
+![AWS Security Monitoring Baseline Architecture](architecture/aws-security-monitoring-baseline.png)
+
 ## CloudTrail Logging Baseline
 
 The first phase of this project sets up CloudTrail logging for the AWS account.
