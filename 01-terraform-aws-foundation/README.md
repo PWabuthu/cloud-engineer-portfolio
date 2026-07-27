@@ -1,10 +1,18 @@
 # AWS Infrastructure Foundation
 
+## Business Scenario
+
+A growing company needs a secure, repeatable AWS network foundation where internal application servers are not directly exposed to the internet but can still receive updates and be accessed securely by administrators.
+
+This project demonstrates how that environment can be designed across multiple Availability Zones and recreated consistently using Terraform while following foundational AWS networking and security best practices.
+
+## Project Goal
+
 I built this project to get a better understanding of how AWS networking works in a real environment.
 
-I started by building the infrastructure manually in the AWS Console instead of jumping straight into Terraform. That helped me understand what each part was doing before I tried to automate it.
+I started by building the infrastructure manually in the AWS Console instead of jumping straight into Terraform. That helped me understand what each component was doing before I automated it.
 
-After the manual build was working, I documented the architecture, terminated the AWS resources to keep costs down, and started rebuilding the same environment with Terraform.
+After the manual build was working, I documented the architecture, terminated the AWS resources to keep costs down, and then rebuilt the same environment using Terraform.
 
 The project includes a custom VPC, public and private subnets across two Availability Zones, a Bastion Host, private EC2 instances, NAT Gateway, IAM roles, VPC Flow Logs, and CloudWatch.
 
