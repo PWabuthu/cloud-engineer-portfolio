@@ -2,19 +2,13 @@
 
 ## Business Scenario
 
-A growing company needs a secure, repeatable AWS network foundation where internal application servers are not directly exposed to the internet but can still receive updates and be accessed securely by administrators.
+A growing company needs a secure, repeatable AWS network foundation where internal application servers remain private while still allowing secure administrative access and controlled outbound internet connectivity.
 
 This project demonstrates how that environment can be designed across multiple Availability Zones and recreated consistently using Terraform while following foundational AWS networking and security best practices.
 
 ## Project Goal
 
-I built this project to get a better understanding of how AWS networking works in a real environment.
-
-I started by building the infrastructure manually in the AWS Console instead of jumping straight into Terraform. That helped me understand what each component was doing before I automated it.
-
-After the manual build was working, I documented the architecture, terminated the AWS resources to keep costs down, and then rebuilt the same environment using Terraform.
-
-The project includes a custom VPC, public and private subnets across two Availability Zones, a Bastion Host, private EC2 instances, NAT Gateway, IAM roles, VPC Flow Logs, and CloudWatch.
+This project builds a custom VPC with public and private subnets across two Availability Zones, a Bastion Host, private EC2 instances, NAT Gateway, IAM roles, VPC Flow Logs, and CloudWatch — first deployed manually in the AWS Console, then rebuilt using Terraform.
 
 ---
 
@@ -27,10 +21,10 @@ The project includes a custom VPC, public and private subnets across two Availab
 * AWS resources destroyed after validation to control costs
 
 ---
-
+ 
 ## Architecture Diagram
 
-The diagram below shows the current design for this project.
+The architecture below implements the business scenario by isolating application workloads in private subnets, providing secure administrative access through a Bastion Host, and enabling controlled outbound internet access through a NAT Gateway.
 
 ![AWS Infrastructure Foundation Architecture](architecture/aws-infrastructure-foundation.png)
 
@@ -132,55 +126,35 @@ I sent the logs to CloudWatch so I could actually see what was moving through th
 
 ---
 
-## Design Decisions
+## Design Decisions & Trade-Offs
+
+The choices below reflect trade-offs I made between learning objectives, AWS costs, and production best practices.
 
 ### Bastion Host for Private Access
 
-I used a Bastion Host to control administrative access into the private subnet.
+I used a Bastion Host to control administrative access into the private subnet. This made the access path easy to understand — I could see the connection flow from my machine, to the bastion, and then into the private instance, which helped me learn the underlying networking and security group behavior clearly.
 
-This made the access path easier to understand because I could see the connection flow from my machine, to the bastion, and then into the private instance.
-
-A stronger production option would be AWS Systems Manager Session Manager, which can reduce or remove the need for SSH access. I kept the Bastion Host in this project because it helped me learn the networking and security group behavior more clearly.
+The trade-off is that it introduces another EC2 instance to manage and secure. A stronger production option would be AWS Systems Manager Session Manager, which removes the need for SSH access entirely. I kept the Bastion Host in this project because understanding the traditional access pattern first made the more advanced option easier to reason about later.
 
 ---
-
-### Private EC2 Instances Across Two Availability Zones
-
-The architecture includes private EC2 instances across two Availability Zones to demonstrate multi-AZ subnet design.
-
-This does not make the application highly available by itself. A true high-availability design would also include services like an Application Load Balancer and Auto Scaling.
-
-For this project, the goal was to understand the network foundation first.
-
----
-
-### Public Subnet B Reserved for Future ALB
-
-Public Subnet B is reserved for a future Application Load Balancer.
-
-I did not add the ALB in this phase because the focus of this project is the network foundation, access control, monitoring, and Terraform rebuild. Reserving space for the ALB shows how the architecture could grow later without redesigning the VPC.
-
----
-
-## Trade-Offs Considered
 
 ### Single NAT Gateway
 
-This project uses one NAT Gateway to keep the design simpler and reduce costs.
-
-A more resilient production design would use one NAT Gateway per Availability Zone. That would reduce cross-AZ dependency, but it would also increase cost.
+This project uses one NAT Gateway to keep the design simpler and reduce costs. A more resilient production design would use one NAT Gateway per Availability Zone to reduce cross-AZ dependency, but that also increases cost.
 
 For this project, one NAT Gateway was enough to practice private subnet outbound internet access while staying cost-conscious.
 
 ---
 
-### Bastion Host vs Session Manager
+### Public Subnet B Reserved for Future ALB
 
-A Bastion Host makes SSH access easier to visualize and troubleshoot, especially while learning AWS networking.
+Public Subnet B is reserved for a future Application Load Balancer. I didn't add the ALB in this phase because the focus of this project was the network foundation, access control, monitoring, and the Terraform rebuild. Reserving the space shows how the architecture could grow later without redesigning the VPC.
 
-The trade-off is that it introduces another EC2 instance to manage and secure.
+---
 
-AWS Systems Manager Session Manager would be a better long-term option because it can provide access without opening SSH ports, but I chose the Bastion Host pattern first to understand the underlying network flow.
+### Private EC2 Instances Across Two Availability Zones
+
+The architecture includes private EC2 instances across two Availability Zones to demonstrate multi-AZ subnet design. This doesn't make the application highly available by itself — a true high-availability design would also need an Application Load Balancer and Auto Scaling. For this project, the goal was to get the network foundation right first.
 
 ---
 
@@ -260,7 +234,7 @@ After confirming the resources were created and the VPC Flow Log was active, I d
 
 ---
 
-## Future Improvements
+## What I'd Do Differently in Production
 
 A few things I'd change for a production environment:
 
@@ -270,4 +244,4 @@ I would also add an Application Load Balancer and Auto Scaling Group if this env
 
 For monitoring, I would add CloudWatch metric filters, alarms, and a small dashboard so the VPC Flow Logs are easier to review during troubleshooting.
 
-The next project will build on this by focusing more directly on AWS security monitoring, including CloudTrail, GuardDuty, AWS Config, SNS alerts, and security findings documentation.
+This project laid the foundation for my next portfolio project, where I implemented AWS security monitoring using CloudTrail, GuardDuty, AWS Config, Amazon SNS, and EventBridge.
