@@ -1,8 +1,12 @@
 # AWS Security Monitoring Baseline
 
-This is the follow-up to my networking project. That project was about building the environment: VPC, subnets, Terraform, NAT Gateway, bastion access, and VPC Flow Logs. This one is about monitoring what happens inside an AWS account.
+## Business Scenario
 
-I'm setting up a basic account monitoring baseline using CloudTrail, GuardDuty, AWS Config, EventBridge, SNS, Amazon S3, and IAM. The goal is to log account activity, detect suspicious behavior, catch risky configurations, and send alerts when something needs attention.
+Organizations running cloud infrastructure often have no real-time visibility into suspicious account activity or risky configuration changes — issues surface during an audit or after an incident, not before. This project addresses that gap by building a baseline monitoring and alerting pipeline that continuously detects threats and configuration drift instead of relying on periodic manual review.
+
+## Project Goal
+
+This is the follow-up to my networking project, which focused on building the environment — VPC, subnets, Terraform, NAT Gateway, bastion access, and VPC Flow Logs. This project builds a foundational AWS account security monitoring baseline using CloudTrail, GuardDuty, AWS Config, EventBridge, SNS, Amazon S3, and IAM — logging account activity, detecting suspicious behavior, catching risky configurations, and sending alerts when something needs attention.
 
 ## Project Status
 
@@ -116,6 +120,17 @@ For EventBridge and SNS, I used an SNS topic policy that allows EventBridge to p
 
 The permissions are scoped to the specific bucket, topic, or AWS service role used in this project. I did not add `aws:SourceArn` or `aws:SourceAccount` conditions to the bucket policies in this version, so I am treating that as a hardening improvement for a later pass rather than claiming it is already handled.
 
+## Design Decisions & Trade-Offs
+
+**EventBridge between GuardDuty and SNS**
+I used EventBridge as the routing layer because it lets me filter, enrich, or redirect findings before they reach notification systems, keeping the architecture flexible as monitoring grows.
+
+**Medium-and-higher severity alerts only**
+Initially every GuardDuty finding generated an email. That created unnecessary noise, so I changed the rule to notify only for medium and higher severity findings, leaving lower-severity findings available for review elsewhere.
+
+**AWS Config validation, not assumption**
+Rather than assuming the managed rules worked, I intentionally introduced an unrestricted SSH rule and confirmed AWS Config marked it as `NON_COMPLIANT` before removing it.
+
 ## How to Deploy
 
 This project is deployed with Terraform.
@@ -201,8 +216,16 @@ The runbook covers:
 
 Runbook: [Security Monitoring Runbook](docs/security-runbook.md)
 
+## What I'd Do Differently in Production
+
+For a production deployment, I'd make several improvements:
+
+- Add AWS Security Hub to centralize findings from multiple AWS security services.
+- Archive lower-severity GuardDuty findings instead of dropping them from email notifications.
+- Harden S3 bucket policies with `aws:SourceArn` and `aws:SourceAccount` conditions.
+- Forward CloudTrail and GuardDuty findings into a SIEM platform for centralized investigation.
+- Expand the AWS Config managed rules to cover additional security and compliance controls.
+
 ## Why I Built This
 
-The networking project was about building infrastructure. This project is about watching what happens after the infrastructure exists.
-
-I wanted to practice the monitoring side of AWS: logging account activity, detecting suspicious behavior, checking risky configurations, and documenting how I would investigate findings.
+Rather than just detecting security findings, I wanted to understand how to validate a monitoring pipeline end to end, investigate what a finding actually means, and document a response process — the operational side of cloud security that a certification exam doesn't test.
