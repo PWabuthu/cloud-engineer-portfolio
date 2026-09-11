@@ -1,0 +1,79 @@
+name: Terraform CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "02-aws-security-monitoring/terraform/**"
+      - ".github/workflows/terraform-cd.yml"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: terraform-production
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: 02-aws-security-monitoring/terraform
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::587728158613:role/github-actions-terraform
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -no-color
+
+  apply:
+    needs: plan
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
+
+    defaults:
+      run:
+        working-directory: 02-aws-security-monitoring/terraform
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::587728158613:role/github-actions-terraform
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
