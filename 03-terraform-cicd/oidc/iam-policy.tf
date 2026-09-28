@@ -69,6 +69,7 @@ data "aws_iam_policy_document" "github_actions_permissions" {
       "s3:GetBucketPolicy",
       "s3:PutBucketPolicy",
       "s3:DeleteBucketPolicy",
+      "s3:GetBucketAcl",
       "s3:GetBucketPublicAccessBlock",
       "s3:PutBucketPublicAccessBlock",
       "s3:DeleteBucketPublicAccessBlock",
@@ -141,7 +142,8 @@ data "aws_iam_policy_document" "github_actions_permissions" {
       "sns:TagResource",
       "sns:UntagResource",
       "sns:Subscribe",
-      "sns:Unsubscribe"
+      "sns:Unsubscribe",
+      "sns:GetSubscriptionAttributes"
     ]
 
     resources = [
@@ -212,7 +214,8 @@ data "aws_iam_policy_document" "github_actions_permissions" {
       "iam:UntagRole",
       "iam:AttachRolePolicy",
       "iam:DetachRolePolicy",
-      "iam:ListAttachedRolePolicies"
+      "iam:ListAttachedRolePolicies",
+      "iam:ListRolePolicies"
     ]
 
     resources = [
