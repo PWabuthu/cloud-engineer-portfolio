@@ -78,7 +78,8 @@ data "aws_iam_policy_document" "github_actions_permissions" {
       "s3:GetEncryptionConfiguration",
       "s3:PutEncryptionConfiguration",
       "s3:DeleteBucketEncryption",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:GetBucketCORS"
     ]
 
     resources = [
