@@ -57,6 +57,22 @@ data "aws_iam_policy_document" "github_actions_permissions" {
   }
 
 
+  # Read Project 2 S3 bucket configuration during Terraform refresh
+  statement {
+    sid    = "SecurityMonitoringS3BucketRead"
+    effect = "Allow"
+
+    actions = [
+      "s3:Get*",
+      "s3:ListBucket"
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.project_name}-cloudtrail-logs-*",
+      "arn:aws:s3:::${var.project_name}-config-logs-*"
+    ]
+  }
+
   # Manage Project 2 logging buckets
   statement {
     sid    = "SecurityMonitoringS3BucketManagement"
@@ -65,23 +81,13 @@ data "aws_iam_policy_document" "github_actions_permissions" {
     actions = [
       "s3:CreateBucket",
       "s3:DeleteBucket",
-      "s3:GetBucketLocation",
-      "s3:GetBucketPolicy",
       "s3:PutBucketPolicy",
       "s3:DeleteBucketPolicy",
-      "s3:GetBucketAcl",
-      "s3:GetBucketPublicAccessBlock",
       "s3:PutBucketPublicAccessBlock",
       "s3:DeleteBucketPublicAccessBlock",
-      "s3:GetBucketVersioning",
       "s3:PutBucketVersioning",
-      "s3:GetEncryptionConfiguration",
       "s3:PutEncryptionConfiguration",
-      "s3:DeleteBucketEncryption",
-      "s3:ListBucket",
-      "s3:GetBucketCORS",
-      "s3:GetBucketWebsite",
-      "s3:GetAccelerateConfiguration"
+      "s3:DeleteBucketEncryption"
     ]
 
     resources = [
