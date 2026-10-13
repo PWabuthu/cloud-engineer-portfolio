@@ -75,7 +75,7 @@ data "aws_iam_policy_document" "config_bucket_policy" {
     actions = ["s3:GetBucketAcl"]
 
     resources = [
-      aws_s3_bucket.config_logs.arn
+      "arn:aws:s3:::${aws_s3_bucket.config_logs.id}"
     ]
   }
 
@@ -91,9 +91,8 @@ data "aws_iam_policy_document" "config_bucket_policy" {
     actions = ["s3:PutObject"]
 
     resources = [
-      "${aws_s3_bucket.config_logs.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/Config/*"
+      "arn:aws:s3:::${aws_s3_bucket.config_logs.id}/AWSLogs/${data.aws_caller_identity.current.account_id}/Config/*"
     ]
-
     condition {
       test     = "StringEquals"
       variable = "s3:x-amz-acl"
