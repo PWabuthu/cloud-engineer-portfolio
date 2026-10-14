@@ -87,7 +87,10 @@ data "aws_iam_policy_document" "github_actions_permissions" {
       "s3:DeleteBucketPublicAccessBlock",
       "s3:PutBucketVersioning",
       "s3:PutEncryptionConfiguration",
-      "s3:DeleteBucketEncryption"
+      "s3:DeleteBucketEncryption",
+      "s3:PutBucketTagging",
+      "s3:DeleteBucketTagging"
+
     ]
 
     resources = [
@@ -112,11 +115,23 @@ data "aws_iam_policy_document" "github_actions_permissions" {
       "cloudtrail:ListTags",
       "cloudtrail:AddTags",
       "cloudtrail:RemoveTags"
+
     ]
 
     resources = [
       "arn:aws:cloudtrail:us-east-1:${data.aws_caller_identity.current.account_id}:trail/${var.project_name}-trail"
     ]
+  }
+
+  statement {
+    sid    = "CloudTrailReadGlobal"
+    effect = "Allow"
+
+    actions = [
+      "cloudtrail:DescribeTrails"
+    ]
+
+    resources = ["*"]
   }
 
   # Manage the Project 2 GuardDuty detector
@@ -197,6 +212,7 @@ data "aws_iam_policy_document" "github_actions_permissions" {
       "config:PutDeliveryChannel",
       "config:DeleteDeliveryChannel",
       "config:DescribeDeliveryChannels",
+      "config:DescribeConfigurationRecorderStatus",
 
       "config:PutConfigRule",
       "config:DeleteConfigRule",
@@ -205,6 +221,7 @@ data "aws_iam_policy_document" "github_actions_permissions" {
       "config:ListTagsForResource",
       "config:TagResource",
       "config:UntagResource"
+
     ]
 
     resources = ["*"]
