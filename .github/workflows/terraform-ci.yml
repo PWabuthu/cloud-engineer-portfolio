@@ -10,6 +10,10 @@ permissions:
   contents: read
   id-token: write
 
+concurrency:
+  group: terraform-ci-security-monitoring
+  cancel-in-progress: false
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
@@ -43,4 +47,4 @@ jobs:
       - name: Terraform Plan
         env:
           TF_VAR_alert_email: ${{ secrets.TF_VAR_ALERT_EMAIL }}
-        run: terraform plan -no-color
+        run: terraform plan -no-color -lock-timeout=5m
