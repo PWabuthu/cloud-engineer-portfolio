@@ -48,7 +48,7 @@ jobs:
       - name: Terraform Plan
         env:
           TF_VAR_alert_email: ${{ secrets.TF_VAR_ALERT_EMAIL }}
-        run: terraform plan -no-color -out=tfplan
+        run: terraform plan -no-color -lock-timeout=5m -out=tfplan
 
       - name: Upload Terraform Plan
         uses: actions/upload-artifact@v4
