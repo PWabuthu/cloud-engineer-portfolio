@@ -83,8 +83,6 @@ The goal is to separate proposing a change from actually deploying it.
 
 ## Architecture Diagram
 
-<!-- TODO: add diagram at architecture/terraform-cicd-pipeline.png -->
-
 ![Terraform CI/CD Pipeline Architecture](architecture/terraform-cicd-pipeline.png)
 
 ## Remote State Backend
@@ -383,15 +381,6 @@ After deployment, I checked the environment again locally with `terraform plan`.
 Terraform returned `No changes. Your infrastructure matches the configuration.`
 
 I also verified that CloudTrail was logging and AWS Config was recording successfully.
-
-### Validation Screenshots
-
-<!-- TODO: add screenshots -->
-
-- `screenshots/ci-plan-on-pull-request.png`
-- `screenshots/cd-production-approval.png`
-- `screenshots/cd-apply-complete.png`
-- `screenshots/terraform-final-no-changes.png`
 
 ## What I'd Do Differently in Production
 

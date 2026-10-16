@@ -12,7 +12,7 @@ Each project is built, tested, documented, and reviewed so I can explain the arc
 |---|---|---|---|
 | [01 - AWS Infrastructure Foundation](01-terraform-aws-foundation) | Complete | VPC, public/private subnets, EC2, NAT Gateway, bastion access, IAM, VPC Flow Logs, Terraform | AWS networking fundamentals, access control, private subnet routing, infrastructure visibility, and Terraform-based rebuild |
 | [02 - AWS Security Monitoring Baseline](02-aws-security-monitoring) | Complete | CloudTrail, GuardDuty, EventBridge, SNS, AWS Config, S3, IAM, Terraform | Security monitoring, alert routing, severity filtering, compliance validation, security runbook documentation, and operational cleanup lessons |
-| Cloud Resume with CI/CD | Planned | S3, CloudFront, Route 53, Lambda, API Gateway, DynamoDB, GitHub Actions, Terraform | Application deployment, serverless backend, CI/CD, and public web hosting |
+| [03 - Terraform CI/CD Pipeline](03-terraform-cicd) | Complete | GitHub Actions, OIDC, Terraform remote state, S3, DynamoDB, IAM | Infrastructure delivery automation, short-lived credential authentication, approval-gated deployment, and least-privilege IAM for CI/CD |
 | Security Automation with Lambda and Python | Planned | Lambda, Python, EventBridge, GuardDuty or AWS Config, SNS | Event-driven security response and automated remediation |
 | Multi-Account Landing Zone with Transit Gateway | Future | AWS Organizations, Transit Gateway, inspection VPC, spoke VPCs, Terraform | Advanced AWS networking, segmentation, and enterprise-style cloud architecture |
 
@@ -53,6 +53,20 @@ The project includes:
 The strongest part of this project was validation. I generated GuardDuty sample findings to confirm alert delivery, then tuned the alert path after the first version created too much email noise. I also confirmed AWS Config marked an intentionally misconfigured security group as `NON_COMPLIANT`.
 
 Project link: [AWS Security Monitoring Baseline](02-aws-security-monitoring)
+
+## Project 3: Terraform CI/CD Pipeline
+
+The third project focuses on how Terraform changes are delivered after the infrastructure already exists.
+
+I moved the Project 2 Terraform state from local storage to an S3 remote backend, added DynamoDB state locking, and built GitHub Actions workflows for CI and CD.
+
+Pull requests now run Terraform formatting, validation, initialization, and planning without applying changes. After changes are reviewed and merged into `main`, the CD workflow creates a saved Terraform plan, waits for approval through a protected GitHub environment, and applies that exact plan.
+
+GitHub Actions authenticates to AWS using OIDC and AWS STS instead of long-lived access keys stored in GitHub.
+
+The project also includes scoped IAM permissions, OIDC trust-policy restrictions, workflow concurrency controls, Terraform lock timeouts, state reconciliation, and recovery from partial Terraform applies.
+
+Project link: [Terraform CI/CD Pipeline](03-terraform-cicd)
 
 ## Focus Areas
 
