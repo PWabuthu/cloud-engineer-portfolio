@@ -282,3 +282,196 @@ resource "aws_iam_role_policy_attachment" "github_actions_terraform" {
   role       = aws_iam_role.github_actions.name
   policy_arn = aws_iam_policy.github_actions_terraform.arn
 }
+
+# Permissions for CI/CD Terraform plan operations
+data "aws_iam_policy_document" "github_actions_plan_permissions" {
+
+  # Terraform remote state bucket
+  statement {
+    sid    = "TerraformStateBucketAccess"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket"
+    ]
+
+    resources = [
+      "arn:aws:s3:::pwabuthu-terraform-state"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:prefix"
+
+      values = [
+        "security-monitoring/terraform.tfstate"
+      ]
+    }
+  }
+
+  # Terraform must be able to access the state object.
+  # PutObject is backend/state access, not permission to modify Project 2 infrastructure.
+  statement {
+    sid    = "TerraformStateObjectAccess"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject"
+    ]
+
+    resources = [
+      "arn:aws:s3:::pwabuthu-terraform-state/security-monitoring/terraform.tfstate"
+    ]
+  }
+
+  # Terraform state locking
+  statement {
+    sid    = "TerraformStateLockAccess"
+    effect = "Allow"
+
+    actions = [
+      "dynamodb:DescribeTable",
+      "dynamodb:GetItem",
+      "dynamodb:PutItem",
+      "dynamodb:DeleteItem"
+    ]
+
+    resources = [
+      "arn:aws:dynamodb:us-east-1:${data.aws_caller_identity.current.account_id}:table/terraform-state-locks"
+    ]
+  }
+
+  # Read Project 2 S3 configuration
+  statement {
+    sid    = "SecurityMonitoringS3Read"
+    effect = "Allow"
+
+    actions = [
+      "s3:Get*",
+      "s3:ListBucket"
+    ]
+
+    resources = [
+      "arn:aws:s3:::${var.project_name}-cloudtrail-logs-*",
+      "arn:aws:s3:::${var.project_name}-config-logs-*"
+    ]
+  }
+
+  # Read CloudTrail configuration
+  statement {
+    sid    = "SecurityMonitoringCloudTrailRead"
+    effect = "Allow"
+
+    actions = [
+      "cloudtrail:GetTrail",
+      "cloudtrail:GetTrailStatus",
+      "cloudtrail:ListTags"
+    ]
+
+    resources = [
+      "arn:aws:cloudtrail:us-east-1:${data.aws_caller_identity.current.account_id}:trail/${var.project_name}-trail"
+    ]
+  }
+
+  statement {
+    sid    = "CloudTrailDescribe"
+    effect = "Allow"
+
+    actions = [
+      "cloudtrail:DescribeTrails"
+    ]
+
+    resources = ["*"]
+  }
+
+  # Read GuardDuty configuration
+  statement {
+    sid    = "SecurityMonitoringGuardDutyRead"
+    effect = "Allow"
+
+    actions = [
+      "guardduty:GetDetector",
+      "guardduty:ListTagsForResource"
+    ]
+
+    resources = ["*"]
+  }
+
+  # Read SNS configuration
+  statement {
+    sid    = "SecurityMonitoringSNSRead"
+    effect = "Allow"
+
+    actions = [
+      "sns:GetTopicAttributes",
+      "sns:GetSubscriptionAttributes",
+      "sns:ListTagsForResource"
+    ]
+
+    resources = [
+      "arn:aws:sns:us-east-1:${data.aws_caller_identity.current.account_id}:${var.project_name}-security-alerts",
+      "arn:aws:sns:us-east-1:${data.aws_caller_identity.current.account_id}:${var.project_name}-security-alerts:*"
+    ]
+  }
+
+  # Read EventBridge configuration
+  statement {
+    sid    = "SecurityMonitoringEventBridgeRead"
+    effect = "Allow"
+
+    actions = [
+      "events:DescribeRule",
+      "events:ListTargetsByRule",
+      "events:ListTagsForResource"
+    ]
+
+    resources = [
+      "arn:aws:events:us-east-1:${data.aws_caller_identity.current.account_id}:rule/${var.project_name}-guardduty-findings"
+    ]
+  }
+
+  # Read AWS Config configuration
+  statement {
+    sid    = "SecurityMonitoringConfigRead"
+    effect = "Allow"
+
+    actions = [
+      "config:DescribeConfigurationRecorders",
+      "config:DescribeConfigurationRecorderStatus",
+      "config:DescribeDeliveryChannels",
+      "config:DescribeConfigRules",
+      "config:ListTagsForResource"
+    ]
+
+    resources = ["*"]
+  }
+
+  # Read the AWS Config IAM role
+  statement {
+    sid    = "SecurityMonitoringIAMRead"
+    effect = "Allow"
+
+    actions = [
+      "iam:GetRole",
+      "iam:ListAttachedRolePolicies",
+      "iam:ListRolePolicies"
+    ]
+
+    resources = [
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.project_name}-config-role"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "github_actions_plan" {
+  name        = "github-actions-terraform-plan-policy"
+  description = "Read infrastructure and manage Terraform backend state for GitHub Actions plan operations"
+
+  policy = data.aws_iam_policy_document.github_actions_plan_permissions.json
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_plan" {
+  role       = aws_iam_role.github_actions_plan.name
+  policy_arn = aws_iam_policy.github_actions_plan.arn
+}
