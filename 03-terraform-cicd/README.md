@@ -109,43 +109,45 @@ The OIDC configuration uses `cicd-oidc/terraform.tfstate`.
 
 That keeps the state files separate even though they are stored in the same S3 bucket.
 
-## GitHub OIDC Authentication
+## OIDC Authentication
 
-One of the main goals of this project was avoiding long-lived AWS access keys in GitHub.
+GitHub Actions authenticates to AWS using OIDC instead of long-lived access keys.
 
-Instead of creating an IAM user and storing an access key and secret key as GitHub secrets, I registered GitHub's token service as an OIDC identity provider in AWS.
+Two IAM roles are used:
 
-```text
-GitHub Actions
-      |
-      | OIDC token
-      v
-AWS STS
-      |
-      | temporary credentials
-      v
-github-actions-terraform IAM role
-```
+- `github-actions-terraform-plan`
+  - Trusted by pull request workflows and the `main` branch
+  - Used by CI and the CD plan job
 
-The credentials only exist for the workflow session.
+- `github-actions-terraform`
+  - Trusted only by the GitHub `production` environment
+  - Used by the production apply job
 
-The IAM trust policy also limits which GitHub identities can assume the role.
+Both trust policies require the OIDC audience (`aud`) to equal `sts.amazonaws.com`, and the subject (`sub`) must match the exact GitHub context allowed for that role.
 
-The `aud` condition requires `sts.amazonaws.com`.
+This keeps the permission boundary in AWS IAM rather than relying only on the workflow file.
 
-The `sub` condition is restricted to specific GitHub contexts:
+### Separate Plan and Deployment Roles
 
-```text
-repo:PWabuthu/cloud-engineer-portfolio:ref:refs/heads/main
-repo:PWabuthu/cloud-engineer-portfolio:environment:production
-repo:PWabuthu/cloud-engineer-portfolio:pull_request
-```
+The original pipeline used one AWS IAM role for CI planning and production deployments. Although the workflow only ran `terraform plan` during CI, the AWS role itself still had permissions to modify infrastructure.
 
-My first version used `repo:PWabuthu/cloud-engineer-portfolio:*`.
+I refactored the pipeline into two OIDC roles:
 
-That limited access to my repository, but the wildcard still allowed any branch context in the repository to match.
+- `github-actions-terraform-plan`
+  - Used by pull request CI and the CD plan job
+  - Can read Project 2 infrastructure
+  - Can access the Terraform remote state backend
+  - Can acquire and release the Terraform state lock
+  - Cannot create, update, or delete Project 2 infrastructure
 
-I replaced that with exact subject values so the trust policy is more restrictive.
+- `github-actions-terraform`
+  - Used only by the production apply job
+  - Retains the permissions required to deploy the stack
+  - Its OIDC trust policy only allows the GitHub `production` environment to assume it
+
+This means a pull request workflow cannot assume the production deployment role even if the workflow file is modified.
+
+The migration was performed incrementally: the new plan role was created and tested first, CI and CD planning were moved to it, and only after those workflows succeeded was the existing deployment role restricted to the production environment.
 
 ## CI Workflow
 
@@ -195,7 +197,11 @@ That closed the gap between what was reviewed and what was actually deployed.
 
 ## IAM and Permissions
 
-The GitHub Actions role needed enough permission to manage the Project 2 security monitoring infrastructure without simply attaching `AdministratorAccess`.
+The GitHub Actions roles needed different permission levels for planning and production deployment without relying on `AdministratorAccess`.
+
+The plan role is limited to reading Project 2 infrastructure and accessing the Terraform backend and state lock.
+
+The deployment role retains the write permissions required to create, update, and delete Project 2 resources during approved production applies.
 
 I scoped permissions to project resources wherever AWS supported resource-level permissions.
 
@@ -383,6 +389,28 @@ After deployment, I checked the environment again locally with `terraform plan`.
 Terraform returned `No changes. Your infrastructure matches the configuration.`
 
 I also verified that CloudTrail was logging and AWS Config was recording successfully.
+
+### Separate Plan and Deployment Roles
+
+The original pipeline used one AWS IAM role for CI planning and production deployments. Although the workflow only ran `terraform plan` during CI, the AWS role itself still had permissions to modify infrastructure.
+
+I refactored the pipeline into two OIDC roles:
+
+- `github-actions-terraform-plan`
+  - Used by pull request CI and the CD plan job
+  - Can read Project 2 infrastructure
+  - Can access the Terraform remote state backend
+  - Can acquire and release the Terraform state lock
+  - Cannot create, update, or delete Project 2 infrastructure
+
+- `github-actions-terraform`
+  - Used only by the production apply job
+  - Retains the permissions required to deploy the stack
+  - Its OIDC trust policy only allows the GitHub `production` environment to assume it
+
+This means a pull request workflow cannot assume the production deployment role even if the workflow file is modified.
+
+The migration was performed incrementally: the new plan role was created and tested first, CI and CD planning were moved to it, and only after those workflows succeeded was the existing deployment role restricted to the production environment.
 
 ### Validation Screenshots
 

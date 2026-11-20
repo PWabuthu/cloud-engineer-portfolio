@@ -35,9 +35,7 @@ data "aws_iam_policy_document" "github_actions_assume_role" {
       variable = "token.actions.githubusercontent.com:sub"
 
       values = [
-        "repo:PWabuthu/cloud-engineer-portfolio:ref:refs/heads/main",
         "repo:PWabuthu/cloud-engineer-portfolio:environment:production",
-        "repo:PWabuthu/cloud-engineer-portfolio:pull_request"
       ]
     }
   }
