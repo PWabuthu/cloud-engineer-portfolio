@@ -13,7 +13,7 @@ resource "aws_iam_openid_connect_provider" "github" {
   }
 }
 
-# Trust policy: who may assume this role, and under what conditions
+# Existing deployment role trust policy
 data "aws_iam_policy_document" "github_actions_assume_role" {
   statement {
     effect  = "Allow"
@@ -43,6 +43,7 @@ data "aws_iam_policy_document" "github_actions_assume_role" {
   }
 }
 
+# Existing deployment role
 resource "aws_iam_role" "github_actions" {
   name               = "github-actions-terraform"
   assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role.json
@@ -53,3 +54,42 @@ resource "aws_iam_role" "github_actions" {
   }
 }
 
+# New trust policy for Terraform plan operations only
+data "aws_iam_policy_document" "github_actions_plan_assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.github.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:sub"
+
+      values = [
+        "repo:PWabuthu/cloud-engineer-portfolio:ref:refs/heads/main",
+        "repo:PWabuthu/cloud-engineer-portfolio:pull_request"
+      ]
+    }
+  }
+}
+
+# New role used by CI and CD plan jobs
+resource "aws_iam_role" "github_actions_plan" {
+  name               = "github-actions-terraform-plan"
+  assume_role_policy = data.aws_iam_policy_document.github_actions_plan_assume_role.json
+
+  tags = {
+    Name    = "GitHub Actions Terraform Plan"
+    Project = "cloud-engineer-portfolio"
+  }
+}

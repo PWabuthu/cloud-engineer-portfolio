@@ -65,7 +65,8 @@ Project link: [AWS Security Monitoring Baseline](02-aws-security-monitoring)
 - Compliance checks with AWS Config
 - Troubleshooting and break/fix documentation
 - Architecture diagrams and technical documentation
-
+- CI/CD and infrastructure delivery automation
+- Short-lived AWS authentication with GitHub OIDC
 ## Tools and Services Used
 
 - AWS
@@ -83,6 +84,9 @@ Project link: [AWS Security Monitoring Baseline](02-aws-security-monitoring)
 - CloudWatch Logs
 - GitHub
 - draw.io / diagrams.net
+- GitHub Actions
+- Amazon DynamoDB
+- AWS STS
 
 ## How This Portfolio Is Built
 
